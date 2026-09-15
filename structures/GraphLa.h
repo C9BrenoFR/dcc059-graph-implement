@@ -5,6 +5,7 @@
 #include "Edge.h"
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 /*
 Grafo com base na lista de adjacencia, os nós ainda são guardados dentro de um vetor, mas o resto é feito pela lista.
@@ -38,12 +39,14 @@ class GraphLa
 {
 private:
     std::vector<Node *> nodes;
-    std::vector<std::vector<std::string>> adjacencyList;
+    std::vector<std::vector<int>> adjacencyList;
+    std::unordered_map<std::string, int> nodeIndex;
 public:
     // ========================
     //  Construtor e Destrutor
     // ========================
-    GraphLa(std::vector<Node *> nodes, std::vector<std::vector<std::string>> adjacencyList) : nodes(nodes), adjacencyList(adjacencyList) {}
+    GraphLa(std::vector<Node *> nodes, std::vector<std::vector<int>> adjacencyList, std::unordered_map<std::string, int> nodeIndex)
+        : nodes(nodes), adjacencyList(adjacencyList), nodeIndex(nodeIndex) {}
     GraphLa(std::string instance); // Carrega o grafo com base em um arquivo na pasta de instancias
     GraphLa() {}
     ~GraphLa();
@@ -52,7 +55,7 @@ public:
     //  Getters
     // =========
     std::vector<Node *> getNodes() { return nodes; }
-    std::vector<std::vector<std::string>> getAdjacencyList() { return adjacencyList; }
+    std::vector<std::vector<int>> getAdjacencyList() { return adjacencyList; }
 
     // =========
     //  Setters
