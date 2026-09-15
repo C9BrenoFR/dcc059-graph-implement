@@ -1,0 +1,78 @@
+30
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+N
+O
+P
+Q
+R
+S
+T
+U
+V
+W
+X
+Y
+Z
+AA
+AB
+AC
+AD
+G AB
+D K
+W L
+F V
+J D
+Y T
+C T
+O AC
+H K
+A X
+P Q
+Y I
+P J
+J R
+W I
+U V
+X S
+S F
+N K
+J E
+Z O
+AD K
+D R
+L AB
+S O
+W K
+U AA
+M O
+K V
+AB I
+AA Z
+AC N
+X K
+E AB
+J Q
+T V
+R F
+B Q
+L Q
+L C
+Z AC
+I F
+Q A
+V C
+T G
+E F
+AC I

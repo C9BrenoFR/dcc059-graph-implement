@@ -1,0 +1,25 @@
+10
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+G A
+A C
+H A
+C I
+B G
+C E
+D G
+E J
+C B
+A E
+E D
+J I
+F C
+E F
