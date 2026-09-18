@@ -21,7 +21,7 @@ class GraphMi
 {
 private:
     std::vector<Node *> nodes;
-    std::vector<std::vector<int>> incidencyMatrix;
+    std::vector<std::vector<bool>> incidencyMatrix;
     std::unordered_map<std::string, int> nodeIndex; // nome → id
     int edgeCount;                                   
 
@@ -37,7 +37,7 @@ public:
     //  Getters
     // =========
     std::vector<Node *> getNodes() { return nodes; }
-    std::vector<std::vector<int>> getIncidencyMatrix() { return incidencyMatrix; }
+    std::vector<std::vector<bool>> getIncidencyMatrix() { return incidencyMatrix; }
 
     // =========
     //  Setters

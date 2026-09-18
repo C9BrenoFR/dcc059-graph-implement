@@ -21,10 +21,15 @@ GraphMi::GraphMi(std::string instance)
     }
 
     std::string origin, destination;
+    std::vector<std::pair<std::string, std::string>> edges;
     while (file >> origin >> destination)
-    {
-        addEdge(origin, destination);
-    }
+        edges.emplace_back(origin, destination);
+
+    for (auto &row : incidencyMatrix)
+        row.reserve(edges.size());
+
+    for (auto &e : edges)
+        addEdge(e.first, e.second);
 }
 
 GraphMi::~GraphMi()
