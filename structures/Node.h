@@ -6,15 +6,18 @@
 class Node
 {
 private:
-    std::string id;
+    int id;
+    std::string name;
 
 public:
-    Node(std::string id) : id(id) {}
+    Node(int id, std::string name) : id(id), name(name) {}
     ~Node() {}
 
-    std::string getId() { return id; }
+    int getId() { return id; }
+    std::string getName() { return name; }
 
-    void setId(std::string id) { this->id = id; }
+    void setId(int id) { this->id = id; }
+    void setName(std::string name) { this->name = name; }
 };
 
 #endif
