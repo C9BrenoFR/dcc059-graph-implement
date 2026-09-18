@@ -11,11 +11,13 @@ GraphMi::GraphMi(std::string instance)
     int numNodes;
     file >> numNodes;
 
+    edgeCount = 0;
+
     for (int i = 0; i < numNodes; i++)
     {
-        std::string id;
-        file >> id;
-        addNode(Node(id));
+        std::string name;
+        file >> name;
+        addNode(i, name);
     }
 
     std::string origin, destination;
@@ -31,60 +33,52 @@ GraphMi::~GraphMi()
         delete node;
 }
 
-void GraphMi::addNode(Node node)
+void GraphMi::addNode(int id, const std::string &name)
 {
-    nodes.push_back(new Node(node));
-
-    int numEdges = incidencyMatrix.empty() ? 0 : incidencyMatrix[0].size();
-    incidencyMatrix.emplace_back(numEdges, 0);
+    nodeIndex[name] = id;
+    nodes.push_back(new Node(id, name));
+    incidencyMatrix.emplace_back();
 }
 
-void GraphMi::addEdge(std::string origin, std::string destination)
+void GraphMi::addEdge(const std::string &origin, const std::string &destination)
 {
-    int originIndex = searchNodeIndex(origin);
-    int destinationIndex = searchNodeIndex(destination);
+    auto itO = nodeIndex.find(origin);
+    auto itD = nodeIndex.find(destination);
 
-    if (originIndex < 0 || destinationIndex < 0)
+    if (itO == nodeIndex.end() || itD == nodeIndex.end())
         return;
+
+    int idO = itO->second;
+    int idD = itD->second;
 
     for (auto &row : incidencyMatrix)
         row.push_back(0);
 
-    int edgeColumn = incidencyMatrix[originIndex].size() - 1;
-    incidencyMatrix[originIndex][edgeColumn] = 1;
-    incidencyMatrix[destinationIndex][edgeColumn] = 1;
-}
-
-int GraphMi::searchNodeIndex(std::string node)
-{
-    for (int i = 0; i < nodes.size(); i++)
-    {
-        if (nodes[i]->getId() == node)
-            return i;
-    }
-    return -1;
+    incidencyMatrix[idO][edgeCount] = 1;
+    incidencyMatrix[idD][edgeCount] = 1;
+    edgeCount++;
 }
 
 std::vector<Edge> GraphMi::searchNodeEdges(std::string node)
 {
+    auto it = nodeIndex.find(node);
+    if (it == nodeIndex.end())
+        return {};
+
+    int id = it->second;
+
     std::vector<Edge> foundEdges;
-    int index = this->searchNodeIndex(node);
 
-    if (index < 0)
-        return foundEdges;
-
-    int numEdges = incidencyMatrix[index].size();
-
-    for (int col = 0; col < numEdges; col++)
+    for (int col = 0; col < edgeCount; col++)
     {
-        if (incidencyMatrix[index][col] == 0)
+        if (incidencyMatrix[id][col] == 0)
             continue;
 
-        for (int row = 0; row < nodes.size(); row++)
+        for (int row = 0; row < (int)nodes.size(); row++)
         {
-            if (row != index && incidencyMatrix[row][col] != 0)
+            if (row != id && incidencyMatrix[row][col] != 0)
             {
-                std::string destination = nodes[row]->getId();
+                std::string destination = nodes[row]->getName();
                 foundEdges.push_back(Edge(node, destination));
                 break;
             }
@@ -96,17 +90,18 @@ std::vector<Edge> GraphMi::searchNodeEdges(std::string node)
 
 bool GraphMi::isNodesConected(std::string node_1, std::string node_2)
 {
-    int index_1 = this->searchNodeIndex(node_1);
-    int index_2 = this->searchNodeIndex(node_2);
+    auto it1 = nodeIndex.find(node_1);
+    auto it2 = nodeIndex.find(node_2);
 
-    if (index_1 < 0 || index_2 < 0)
+    if (it1 == nodeIndex.end() || it2 == nodeIndex.end())
         return false;
 
-    int numEdges = incidencyMatrix[index_1].size();
+    int id1 = it1->second;
+    int id2 = it2->second;
 
-    for (int col = 0; col < numEdges; col++)
+    for (int col = 0; col < edgeCount; col++)
     {
-        if (incidencyMatrix[index_1][col] != 0 && incidencyMatrix[index_2][col] != 0)
+        if (incidencyMatrix[id1][col] != 0 && incidencyMatrix[id2][col] != 0)
             return true;
     }
 
