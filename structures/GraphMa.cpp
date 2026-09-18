@@ -11,11 +11,13 @@ GraphMa::GraphMa(std::string instance)
     int numNodes;
     file >> numNodes;
 
+    adjacencyMatrix.assign(numNodes, std::vector<int>(numNodes, 0));
+
     for (int i = 0; i < numNodes; i++)
     {
-        std::string id;
-        file >> id;
-        addNode(Node(id));
+        std::string name;
+        file >> name;
+        addNode(i, name);
     }
 
     std::string origin, destination;
@@ -31,55 +33,41 @@ GraphMa::~GraphMa()
         delete node;
 }
 
-void GraphMa::addNode(Node node)
+void GraphMa::addNode(int id, const std::string &name)
 {
-    nodes.push_back(new Node(node));
-
-    int numNodes = nodes.size();
-
-    for (auto &row : adjacencyMatrix)
-    {
-        row.push_back(0);
-    }
-
-    adjacencyMatrix.emplace_back(numNodes, 0);
+    nodeIndex[name] = id;
+    nodes.push_back(new Node(id, name));
 }
 
-void GraphMa::addEdge(std::string origin, std::string destination)
+void GraphMa::addEdge(const std::string &origin, const std::string &destination)
 {
-    int originIndex = searchNodeIndex(origin);
-    int destinationIndex = searchNodeIndex(destination);
+    auto itO = nodeIndex.find(origin);
+    auto itD = nodeIndex.find(destination);
 
-    if (originIndex < 0 || destinationIndex < 0)
+    if (itO == nodeIndex.end() || itD == nodeIndex.end())
         return;
 
-    adjacencyMatrix[originIndex][destinationIndex] = 1;
-    adjacencyMatrix[destinationIndex][originIndex] = 1;
-}
+    int idO = itO->second;
+    int idD = itD->second;
 
-int GraphMa::searchNodeIndex(std::string node)
-{
-    for (int i = 0; i < nodes.size(); i++)
-    {
-        if (nodes[i]->getId() == node)
-            return i;
-    }
-    return -1;
+    adjacencyMatrix[idO][idD] = 1;
+    adjacencyMatrix[idD][idO] = 1;
 }
 
 std::vector<Edge> GraphMa::searchNodeEdges(std::string node)
 {
+    auto it = nodeIndex.find(node);
+    if (it == nodeIndex.end())
+        return {};
+
+    int id = it->second;
+
     std::vector<Edge> foundEdges;
-    int index = this->searchNodeIndex(node);
-
-    if (index < 0)
-        return foundEdges;
-
-    for (int j = 0; j < adjacencyMatrix[index].size(); j++)
+    for (int j = 0; j < (int)adjacencyMatrix[id].size(); j++)
     {
-        if (adjacencyMatrix[index][j] != 0)
+        if (adjacencyMatrix[id][j] != 0)
         {
-            std::string destination = nodes[j]->getId();
+            std::string destination = nodes[j]->getName();
             foundEdges.push_back(Edge(node, destination));
         }
     }
@@ -89,11 +77,11 @@ std::vector<Edge> GraphMa::searchNodeEdges(std::string node)
 
 bool GraphMa::isNodesConected(std::string node_1, std::string node_2)
 {
-    int index_1 = this->searchNodeIndex(node_1);
-    int index_2 = this->searchNodeIndex(node_2);
+    auto it1 = nodeIndex.find(node_1);
+    auto it2 = nodeIndex.find(node_2);
 
-    if (index_1 < 0 || index_2 < 0)
+    if (it1 == nodeIndex.end() || it2 == nodeIndex.end())
         return false;
 
-    return adjacencyMatrix[index_1][index_2] != 0;
+    return adjacencyMatrix[it1->second][it2->second] != 0;
 }
