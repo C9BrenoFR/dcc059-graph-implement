@@ -63,7 +63,7 @@ void printNodes(const std::vector<Node *> &nodes)
 
     std::cout << col::dim << "  Nos (" << nodes.size() << "): " << col::reset;
     for (size_t i = 0; i < nodes.size(); i++)
-        std::cout << col::yellow << nodes[i]->getId() << col::reset << (i + 1 < nodes.size() ? ", " : "\n");
+        std::cout << col::yellow << nodes[i]->getName() << col::reset << (i + 1 < nodes.size() ? ", " : "\n");
 }
 
 // Lê um inteiro entre min e max, repetindo o prompt até um valor válido
@@ -90,33 +90,6 @@ std::string readNode(const std::string &prompt)
     return node;
 }
 
-void loadGraphs(std::string instance, Graph *graph, GraphLa *graphLa, GraphMa *graphMa, GraphMi *graphMi)
-{
-    std::ifstream file("instances/" + instance);
-
-    int numNodes;
-    file >> numNodes;
-
-    for (int i = 0; i < numNodes; i++)
-    {
-        std::string id;
-        file >> id;
-        graph->addNode(Node(id));
-        graphLa->addNode(Node(id));
-        graphMa->addNode(Node(id));
-        graphMi->addNode(Node(id));
-    }
-
-    std::string origin, destination;
-    while (file >> origin >> destination)
-    {
-        graph->addEdge(Edge(origin, destination));
-        graphLa->addEdge(origin, destination);
-        graphMa->addEdge(origin, destination);
-        graphMi->addEdge(origin, destination);
-    }
-}
-
 int main(int argc, char *argv[])
 {
     if (argc < 2)
@@ -130,17 +103,12 @@ int main(int argc, char *argv[])
 
     std::cout << col::magenta << col::bold
               << "*** Teoria dos Grafos - DCC059 ***" << col::reset << "\n";
-    std::cout << "Carregando instancia " << col::yellow << archieve << col::reset << " ...\n";
+    std::cout << "Instancias serão carregadas posteriormente ...\n";
 
-    Graph graph;
-    GraphLa graphLa;
-    GraphMa graphMa;
-    GraphMi graphMi;
-
-    loadGraphs(archieve, &graph, &graphLa, &graphMa, &graphMi);
-
-    std::cout << col::green << "Instancia carregada com sucesso!" << col::reset
-              << " (" << graph.getNodes().size() << " nos)\n";
+    Graph *graph = nullptr;
+    GraphLa *graphLa = nullptr;
+    GraphMa *graphMa = nullptr;
+    GraphMi *graphMi = nullptr;
 
     while (true)
     {
@@ -155,6 +123,22 @@ int main(int argc, char *argv[])
         if (representation == 0)
             break;
 
+        switch (representation)
+        {
+        case 1:
+            graph = new Graph(archieve);
+            break;
+        case 2:
+            graphLa = new GraphLa(archieve);
+            break;
+        case 3:
+            graphMa = new GraphMa(archieve);
+            break;
+        case 4:
+            graphMi = new GraphMi(archieve);
+            break;
+        }
+
         while (true)
         {
             printHeader("Acao");
@@ -165,7 +149,28 @@ int main(int argc, char *argv[])
             int action = readOption("Escolha: ", 0, 3);
 
             if (action == 0)
+            {
+                switch (representation)
+                {
+                case 1:
+                    delete graph;
+                    graph = nullptr;
+                    break;
+                case 2:
+                    delete graphLa;
+                    graphLa = nullptr;
+                    break;
+                case 3:
+                    delete graphMa;
+                    graphMa = nullptr;
+                    break;
+                case 4:
+                    delete graphMi;
+                    graphMi = nullptr;
+                    break;
+                }
                 break;
+            }
 
             std::cout << "\n";
 
@@ -174,16 +179,16 @@ int main(int argc, char *argv[])
                 switch (representation)
                 {
                 case 1:
-                    printNodes(graph.getNodes());
+                    printNodes(graph->getNodes());
                     break;
                 case 2:
-                    printNodes(graphLa.getNodes());
+                    printNodes(graphLa->getNodes());
                     break;
                 case 3:
-                    printNodes(graphMa.getNodes());
+                    printNodes(graphMa->getNodes());
                     break;
                 case 4:
-                    printNodes(graphMi.getNodes());
+                    printNodes(graphMi->getNodes());
                     break;
                 }
             }
@@ -200,7 +205,7 @@ int main(int argc, char *argv[])
                 case 1:
                 {
                     start = std::chrono::high_resolution_clock::now();
-                    std::vector<Edge> result_1 = graph.searchNodeEdges(node);
+                    std::vector<Edge> result_1 = graph->searchNodeEdges(node);
                     end = std::chrono::high_resolution_clock::now();
                     printEdges(result_1);
                     break;
@@ -208,7 +213,7 @@ int main(int argc, char *argv[])
                 case 2:
                 {
                     start = std::chrono::high_resolution_clock::now();
-                    std::vector<std::string> result_2 = graphLa.searchNodeEdges(node);
+                    std::vector<std::string> result_2 = graphLa->searchNodeEdges(node);
                     end = std::chrono::high_resolution_clock::now();
                     printAdjacency(result_2);
                     break;
@@ -216,7 +221,7 @@ int main(int argc, char *argv[])
                 case 3:
                 {
                     start = std::chrono::high_resolution_clock::now();
-                    std::vector<Edge> result_3 = graphMa.searchNodeEdges(node);
+                    std::vector<Edge> result_3 = graphMa->searchNodeEdges(node);
                     end = std::chrono::high_resolution_clock::now();
                     printEdges(result_3);
                     break;
@@ -224,7 +229,7 @@ int main(int argc, char *argv[])
                 case 4:
                 {
                     start = std::chrono::high_resolution_clock::now();
-                    std::vector<Edge> result_4 = graphMi.searchNodeEdges(node);
+                    std::vector<Edge> result_4 = graphMi->searchNodeEdges(node);
                     end = std::chrono::high_resolution_clock::now();
                     printEdges(result_4);
                     break;
@@ -243,16 +248,16 @@ int main(int argc, char *argv[])
                 switch (representation)
                 {
                 case 1:
-                    connected = graph.isNodesConected(node1, node2);
+                    connected = graph->isNodesConected(node1, node2);
                     break;
                 case 2:
-                    connected = graphLa.isNodesConected(node1, node2);
+                    connected = graphLa->isNodesConected(node1, node2);
                     break;
                 case 3:
-                    connected = graphMa.isNodesConected(node1, node2);
+                    connected = graphMa->isNodesConected(node1, node2);
                     break;
                 case 4:
-                    connected = graphMi.isNodesConected(node1, node2);
+                    connected = graphMi->isNodesConected(node1, node2);
                     break;
                 }
                 auto end = std::chrono::high_resolution_clock::now();
