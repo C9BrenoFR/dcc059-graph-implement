@@ -3,70 +3,59 @@
 
 #include "Node.h"
 #include "Edge.h"
+#include "LinkedList.h"
 #include <string>
 #include <vector>
 #include <unordered_map>
 
 /*
-Grafo com base na lista de adjacencia, os nós ainda são guardados dentro de um vetor, mas o resto é feito pela lista.
+Grafo com base na lista de adjacência usando lista encadeada.
 
-A variavel adjacencyList guarda  N itens onde N é o numero de nós no grafo,
-cada indice em adjacencyList representa o nó de mesmo indice em nodes,
-cada vetor de char dentro de adjacencyList guarda o id dos nós que o representado tem ligação.
+Cada nó recebe um id numérico sequencial (0, 1, 2, ...) que serve como
+índice direto no array de listas encadeadas (adjacencyList).
+
+O unordered_map nodeIndex mapeia nome → id em O(1).
+A lista encadeada (LinkedList) permite inserção O(1) na cabeça.
 
 Exemplo:
 Supondo que temos um grafo simples completo com os nós A,B e C
-Nosso vetor nodes seria:
-A no indice 0
-B no indice 1
-C no indice 2
+  A recebe id=0, B recebe id=1, C recebe id=2
 
 O adjacencyList seria:
-[B,C] no indice 0 (representando os nós com quem A se liga)
-[A,C] no indice 1 (representando os nós com quem B se liga)
-[A,B] no indice 2 (representando os nós com quem C se liga)
-
-
-NOTA:
-Se você nunca usou a biblioteca <vector>, ela serve para otimizar o uso de vetores, com algumas funções auxiliares
-Para pegar um item do vector você pode fazer de duas formas:
-nodes[1] // forma comum
-nodes.at(1) // Caso você acesse um item que não existe (por exemplo, indice 10 num vetor de 5 espaços) ele lança uma exceção ao invés de lixo de memória
-
-A função push_back() usada nas funções de adicionar serve para colocar um item no final do vetor
+  adjacencyList[0] → 1 → 2       (A se liga com B e C)
+  adjacencyList[1] → 0 → 2       (B se liga com A e C)
+  adjacencyList[2] → 0 → 1       (C se liga com A e B)
 */
 class GraphLa
 {
 private:
     std::vector<Node *> nodes;
-    std::vector<std::vector<int>> adjacencyList;
-    std::unordered_map<std::string, int> nodeIndex;
+    LinkedList *adjacencyList;    
+    int capacity;                 
+    std::unordered_map<std::string, int> nodeIndex; // nome → id
+
 public:
     // ========================
     //  Construtor e Destrutor
     // ========================
-    GraphLa(std::vector<Node *> nodes, std::vector<std::vector<int>> adjacencyList, std::unordered_map<std::string, int> nodeIndex)
-        : nodes(nodes), adjacencyList(adjacencyList), nodeIndex(nodeIndex) {}
     GraphLa(std::string instance); // Carrega o grafo com base em um arquivo na pasta de instancias
-    GraphLa() {}
+    GraphLa() : adjacencyList(nullptr), capacity(0) {}
     ~GraphLa();
 
     // =========
     //  Getters
     // =========
     std::vector<Node *> getNodes() { return nodes; }
-    std::vector<std::vector<int>> getAdjacencyList() { return adjacencyList; }
 
     // =========
     //  Setters
     // =========
-    void addNode(Node node);
-    void addEdge(std::string origin, std::string destination); // Liga 2 nós já existentes (grafo não direcionado)
-
+    void addNode(int id, const std::string &name);
+    void addEdge(const std::string &origin, const std::string &destination);
+    
     // ========
     //  Buscas
     // ========
-    int searchNodeIndex(std::string node);
     std::vector<std::string> searchNodeEdges(std::string node);   // Busca todas as arestas ligadas a um determinado vertice
     bool isNodesConected(std::string node_1, std::string node_2); // Verifica se existe aresta entre 2 vertices
 };

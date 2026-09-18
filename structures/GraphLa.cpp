@@ -11,11 +11,14 @@ GraphLa::GraphLa(std::string instance)
     int numNodes;
     file >> numNodes;
 
+    capacity = numNodes;
+    adjacencyList = new LinkedList[capacity];
+
     for (int i = 0; i < numNodes; i++)
     {
-        std::string id;
-        file >> id;
-        addNode(Node(id));
+        std::string name;
+        file >> name;
+        addNode(i, name);
     }
 
     std::string origin, destination;
@@ -29,17 +32,16 @@ GraphLa::~GraphLa()
 {
     for (Node *node : nodes)
         delete node;
+    delete[] adjacencyList;
 }
 
-void GraphLa::addNode(Node node)
+void GraphLa::addNode(int id, const std::string &name)
 {
-    int idx = nodes.size();
-    nodeIndex[node.getId()] = idx;
-    nodes.emplace_back(new Node(node));
-    adjacencyList.emplace_back();
+    nodeIndex[name] = id;
+    nodes.push_back(new Node(id, name));
 }
 
-void GraphLa::addEdge(std::string origin, std::string destination)
+void GraphLa::addEdge(const std::string &origin, const std::string &destination)
 {
     auto itO = nodeIndex.find(origin);
     auto itD = nodeIndex.find(destination);
@@ -47,43 +49,40 @@ void GraphLa::addEdge(std::string origin, std::string destination)
     if (itO == nodeIndex.end() || itD == nodeIndex.end())
         return;
 
-    adjacencyList[itO->second].push_back(itD->second);
-    adjacencyList[itD->second].push_back(itO->second);
-}
+    int idO = itO->second;
+    int idD = itD->second;
 
-int GraphLa::searchNodeIndex(std::string node)
-{
-    auto it = nodeIndex.find(node);
-    return it != nodeIndex.end() ? it->second : -1;
+    adjacencyList[idO].insert(idD);
+    adjacencyList[idD].insert(idO);
 }
 
 std::vector<std::string> GraphLa::searchNodeEdges(std::string node)
 {
-    int idx = searchNodeIndex(node);
-
-    if (idx < 0)
+    auto it = nodeIndex.find(node);
+    if (it == nodeIndex.end())
         return {};
 
+    int id = it->second;
+
     std::vector<std::string> result;
-    result.reserve(adjacencyList[idx].size());
-    for (int neighborIdx : adjacencyList[idx])
-        result.push_back(nodes[neighborIdx]->getId());
+    result.reserve(adjacencyList[id].size());
+
+    for (int neighborId : adjacencyList[id])
+        result.push_back(nodes[neighborId]->getName());
+
     return result;
 }
 
 bool GraphLa::isNodesConected(std::string node_1, std::string node_2)
 {
-    int idx1 = searchNodeIndex(node_1);
-    int idx2 = searchNodeIndex(node_2);
+    auto it1 = nodeIndex.find(node_1);
+    auto it2 = nodeIndex.find(node_2);
 
-    if (idx1 < 0 || idx2 < 0)
+    if (it1 == nodeIndex.end() || it2 == nodeIndex.end())
         return false;
 
-    for (int neighborIdx : adjacencyList[idx1])
-    {
-        if (neighborIdx == idx2)
-            return true;
-    }
+    int id1 = it1->second;
+    int id2 = it2->second;
 
-    return false;
+    return adjacencyList[id1].contains(id2);
 }
