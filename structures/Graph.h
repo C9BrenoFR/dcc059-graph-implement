@@ -5,10 +5,14 @@
 #include "Edge.h"
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 /*
 Grafo comum com foco total em extrutura de dados
 Recebe nós e arestas como objetos e os aloca em vetores
+
+O unordered_map nodeIndex permite buscar o índice de um nó por nome em O(1),
+ao invés de iterar linearmente pelo vetor de nós.
 
 NOTA:
 Se você nunca usou a biblioteca <vector>, ela serve para otimizar o uso de vetores, com algumas funções auxiliares
@@ -23,12 +27,12 @@ class Graph
 private:
     std::vector<Node *> nodes;
     std::vector<Edge *> edges;
+    std::unordered_map<std::string, int> nodeIndex; // nome → id (posição no vetor)
 
 public:
     // ========================
     //  Construtor e Destrutor
     // ========================
-    Graph(std::vector<Node *> nodes, std::vector<Edge *> edges) : nodes(nodes), edges(edges) {}
     Graph(std::string instance); // Carrega o grafo com base em um arquivo na pasta de instancias
     Graph() {}
     ~Graph();
@@ -42,8 +46,8 @@ public:
     // =========
     //  Setters
     // =========
-    void addNode(Node node) { nodes.push_back(new Node(node)); }
-    void addEdge(Edge edge) { edges.push_back(new Edge(edge)); }
+    void addNode(int id, const std::string &name);
+    void addEdge(const std::string &origin, const std::string &destination);
 
     // ========
     //  Buscas
