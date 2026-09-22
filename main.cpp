@@ -123,21 +123,35 @@ int main(int argc, char *argv[])
         if (representation == 0)
             break;
 
+        std::chrono::high_resolution_clock::time_point start_load;
+        std::chrono::high_resolution_clock::time_point end_load;
+
         switch (representation)
         {
         case 1:
+            start_load = std::chrono::high_resolution_clock::now();
             graph = new Graph(archieve);
+            end_load = std::chrono::high_resolution_clock::now();
             break;
         case 2:
+            start_load = std::chrono::high_resolution_clock::now();
             graphLa = new GraphLa(archieve);
+            end_load = std::chrono::high_resolution_clock::now();
             break;
         case 3:
+            start_load = std::chrono::high_resolution_clock::now();
             graphMa = new GraphMa(archieve);
+            end_load = std::chrono::high_resolution_clock::now();
             break;
         case 4:
+            start_load = std::chrono::high_resolution_clock::now();
             graphMi = new GraphMi(archieve);
+            end_load = std::chrono::high_resolution_clock::now();
             break;
         }
+
+        double loadElapsedMs = std::chrono::duration<double, std::milli>(end_load - start_load).count();
+        std::cout << col::dim << "  (carregamento levou " << loadElapsedMs << " ms)" << col::reset << "\n";
 
         while (true)
         {
