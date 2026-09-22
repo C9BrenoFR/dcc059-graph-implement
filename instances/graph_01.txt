@@ -1,4 +1,4 @@
-5
+5 6 0.60
 A
 B
 C
@@ -7,6 +7,6 @@ E
 A B
 A C
 B C
-B E 
+B E
 C D
 D E

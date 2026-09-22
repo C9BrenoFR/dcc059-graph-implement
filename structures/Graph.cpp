@@ -9,8 +9,9 @@ Graph::Graph(std::string instance)
 {
     std::ifstream file("instances/" + instance);
 
-    int numNodes;
-    file >> numNodes;
+    int numNodes, numEdges;
+    float density;
+    file >> numNodes >> numEdges >> density;
 
     for (int i = 0; i < numNodes; i++)
     {
